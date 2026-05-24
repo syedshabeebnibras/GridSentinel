@@ -111,9 +111,10 @@ def _column_xml(name: str, dt: str) -> str:
 
 
 def _datasource_xml(table: str, cols: list[tuple[str, str]]) -> str:
-    """Build a <datasource> for one CSV file. Uses the textscan connection
-    which is what Tableau picks when you "Connect to text file"."""
-    columns = "\n".join(_column_xml(c, d) for c, d in cols)
+    """Build a <datasource> for one CSV file. Absolute minimum: connection
+    only, no column declarations. Tableau auto-discovers columns from the
+    CSV header on first load. Pre-declaring them at datasource level was
+    causing internal error 501CF476 (conflict with auto-detected types)."""
     safe_caption = table.replace("_", " ").title()
     return dedent(f'''\
     <datasource caption="{safe_caption}" inline="true" name="federated.{table}" version="18.1">
@@ -125,8 +126,6 @@ def _datasource_xml(table: str, cols: list[tuple[str, str]]) -> str:
         </named-connections>
         <relation connection="textscan.{table}" name="{table}.csv" table="[{table}#csv]" type="table" />
       </connection>
-      <aliases enabled="yes" />
-{columns}
     </datasource>''')
 
 

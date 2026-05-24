@@ -31,6 +31,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from gridsentinel import __version__ as pkg_version
+from gridsentinel.correlation.correlate import correlate
+from gridsentinel.correlation.dedupe import dedupe
 from gridsentinel.ingest.telemetry import enrich_with_topology
 from gridsentinel.predict.calibrated import shap_explanation_for_node
 from gridsentinel.predict.registry import load_latest
@@ -58,6 +60,92 @@ _state: dict[str, Any] = {
     "latest_windows": pd.DataFrame(),
     "feature_names": [],
 }
+
+
+_SEVERITY_RANK = {"info": 0, "warn": 1, "critical": 2}
+
+
+def _build_summary(events_path: Path, fleet_path: Path) -> dict[str, Any]:
+    """Pre-compute all dashboard panel data once at startup.
+
+    Returns a JSON-serialisable dict the /summary endpoint hands to the web
+    showcase. Cheap to recompute (a few seconds on ~200k events) but we cache
+    it so /summary itself is O(1).
+    """
+    if not (events_path.exists() and fleet_path.exists()):
+        return {}
+
+    try:
+        events = pd.read_parquet(events_path)
+        fleet = pd.read_parquet(fleet_path)
+    except Exception as e:
+        print(f"warning: /summary build failed reading inputs: {e}")
+        return {}
+
+    try:
+        enriched = enrich_with_topology(events, fleet)
+        deduped = dedupe(enriched, window_ticks=5)
+        incidents = correlate(deduped, time_window_ticks=15)
+    except Exception as e:
+        print(f"warning: /summary correlation failed: {e}")
+        return {}
+
+    event_kinds = (
+        events.groupby("kind").size().sort_values(ascending=False).to_dict()
+    )
+    severity_raw = events["severity"].value_counts().to_dict()
+    severity_incidents = incidents["severity_max"].value_counts().to_dict()
+
+    top_incidents = (
+        incidents.nlargest(10, "member_count")[
+            ["incident_id", "root_kind", "scope", "member_count",
+             "severity_max", "any_benign"]
+        ]
+        .to_dict("records")
+    )
+
+    # Mean util series — derive from incidents' tick spread to keep the API
+    # slim (no need to load 12 MB of utilization.parquet).
+    tick_min = int(events["tick"].min())
+    tick_max = int(events["tick"].max())
+    bins = 48
+    edges = list(range(tick_min, tick_max + 1, max(1, (tick_max - tick_min) // bins)))
+    # Severity-weighted activity per tick bucket — proxy for "how busy was the fleet"
+    activity_per_tick = events.assign(
+        weight=events["severity"].map(_SEVERITY_RANK).fillna(0) + 1
+    ).groupby(pd.cut(events["tick"], bins=edges), observed=True)["weight"].sum()
+    util_series = [
+        {"tick": int(interval.mid), "activity": int(val)}
+        for interval, val in activity_per_tick.items()
+        if pd.notna(interval)
+    ]
+
+    return {
+        "event_kinds": [{"kind": k, "count": int(v)} for k, v in event_kinds.items()],
+        "severity": {
+            "raw": {k: int(severity_raw.get(k, 0)) for k in ["info", "warn", "critical"]},
+            "incidents": {
+                k: int(severity_incidents.get(k, 0)) for k in ["info", "warn", "critical"]
+            },
+        },
+        "top_incidents": [
+            {
+                "incident_id": str(r["incident_id"])[:80],
+                "root_kind": str(r["root_kind"]),
+                "scope": str(r["scope"]),
+                "member_count": int(r["member_count"]),
+                "severity_max": str(r["severity_max"]),
+                "any_benign": bool(r["any_benign"]),
+            }
+            for r in top_incidents
+        ],
+        "activity_series": util_series,
+        "totals": {
+            "raw_events": int(len(events)),
+            "incidents": int(len(incidents)),
+            "deduped": int(len(deduped)),
+        },
+    }
 
 
 @asynccontextmanager
@@ -101,6 +189,10 @@ async def lifespan(app: FastAPI):
         except Exception as e:
             # serving should not die if the snapshot is missing/corrupt
             print(f"warning: failed to build latest-window cache: {e}")
+
+    # Pre-compute the dashboard summary once at startup — all panel data
+    # in one cheap blob the /summary endpoint serves to the web showcase.
+    _state["summary"] = _build_summary(events_path, fleet_path)
 
     yield
 
@@ -248,6 +340,17 @@ async def explain(req: ExplainRequest):
         for _, r in shap_df.iterrows()
     ]
     return ExplainResponse(node_id=req.node_id, failure_risk_24h=risk, top_features=entries)
+
+
+@app.get("/summary")
+async def summary():
+    """Pre-computed dashboard panel data: event kinds, severity mix, top
+    incidents, activity timeseries. Cached at startup; restart the service
+    to refresh after a new simulation."""
+    if _state["registry"] is None:
+        raise HTTPException(status_code=503, detail="no model loaded")
+    payload = _state.get("summary") or {}
+    return payload
 
 
 @app.get("/at-risk", response_model=AtRiskResponse)

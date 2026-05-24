@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import Image from "next/image";
+import { LiveDashboard } from "@/components/LiveDashboard";
 import { LiveAtRisk, LiveStatus } from "@/components/LiveStatus";
 
 type Snapshot = {
@@ -206,23 +207,34 @@ export default async function Page() {
         </div>
       </section>
 
-      {/* Dashboard screenshot */}
+      {/* Live operator dashboard — actually live, pulling from /summary */}
       <section className="mx-auto max-w-6xl px-6 py-12 border-t border-line">
         <h2 className="text-2xl font-semibold mb-2">Live operator dashboard</h2>
         <p className="text-mute mb-6">
-          Streamlit dashboard with eight panels — KPI strip, event mix, top incidents,
-          energy & efficiency, capacity forecast, predictive maintenance, root-cause
-          clusters, and utilization timeseries.
+          Same panels as the Streamlit app — KPI strip, event mix, severity
+          breakdown, top incidents, activity timeseries — but rendered natively
+          in React and hydrated from{" "}
+          <code className="text-ink">GET /summary</code> on the Railway API. Every
+          number refreshes every 60 seconds. For the full eight-panel Streamlit
+          experience (clusters, forecast, energy, drift), run it locally with{" "}
+          <code className="text-ink">streamlit run src/gridsentinel/dashboard/app.py</code>.
         </p>
-        <div className="panel overflow-hidden">
-          <Image
-            src="/screenshots/dashboard-v3-final.png"
-            alt="GridSentinel Streamlit dashboard — full view"
-            width={2400}
-            height={6000}
-            className="w-full h-auto"
-          />
-        </div>
+        <LiveDashboard />
+
+        <details className="mt-8 panel p-4 text-sm">
+          <summary className="cursor-pointer text-mute hover:text-ink">
+            Show full Streamlit screenshot (for reference)
+          </summary>
+          <div className="mt-4 overflow-hidden rounded-md">
+            <Image
+              src="/screenshots/dashboard-v3-final.png"
+              alt="GridSentinel Streamlit dashboard — full local view"
+              width={2400}
+              height={6000}
+              className="w-full h-auto"
+            />
+          </div>
+        </details>
       </section>
 
       {/* Architecture */}

@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import Image from "next/image";
+import { LiveAtRisk, LiveStatus } from "@/components/LiveStatus";
 
 type Snapshot = {
   generated_at: string;
@@ -61,9 +62,8 @@ export default async function Page() {
       {/* Glow header */}
       <div className="glow border-b border-line">
         <div className="mx-auto max-w-6xl px-6 py-20">
-          <div className="flex items-center gap-3 text-mute text-sm font-mono mb-6">
-            <span className="inline-block w-2 h-2 rounded-full bg-accent shadow-[0_0_12px_rgba(94,234,212,0.7)]" />
-            <span>model {snap.model_version} · trained {new Date(snap.generated_at).toUTCString()}</span>
+          <div className="mb-6">
+            <LiveStatus />
           </div>
           <h1 className="text-5xl md:text-6xl font-bold tracking-tight">
             GridSentinel
@@ -170,35 +170,7 @@ export default async function Page() {
 
         <div className="grid md:grid-cols-2 gap-6 mt-8">
           <div className="panel p-6">
-            <h3 className="font-semibold mb-4">Top 10 at-risk nodes (next 24h)</h3>
-            <div className="space-y-2">
-              {snap.top_at_risk.map((n) => (
-                <div
-                  key={n.node_id}
-                  className="flex items-center justify-between font-mono text-sm border-b border-line/50 pb-2 last:border-0"
-                >
-                  <div className="flex gap-3">
-                    <span className="text-ink">{n.node_id}</span>
-                    <span className="text-mute">{n.rack_id}</span>
-                    <span className="text-mute">{n.zone_id}</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-mute">anom {n.anomaly_score.toFixed(2)}</span>
-                    <span
-                      className={`px-2 py-0.5 rounded ${
-                        n.failure_risk_24h > 0.7
-                          ? "bg-crit/20 text-crit"
-                          : n.failure_risk_24h > 0.4
-                          ? "bg-warn/20 text-warn"
-                          : "bg-line text-mute"
-                      }`}
-                    >
-                      {(n.failure_risk_24h * 100).toFixed(0)}%
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <LiveAtRisk fallback={snap.top_at_risk} />
           </div>
 
           <div className="panel p-6">

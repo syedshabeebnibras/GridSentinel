@@ -1,0 +1,50 @@
+# Auto-deploy the FastAPI service to Railway on push to main.
+# Interpolations are `secrets.*` only — set by the maintainer in the
+# repository settings, not from untrusted GitHub event payloads.
+name: deploy-railway
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/gridsentinel/serving/**"
+      - "Dockerfile.api"
+      - "railway.json"
+      - ".github/workflows/deploy-railway.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-railway
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    environment:
+      name: production-api
+      url: https://gridsentinel-api-production.up.railway.app
+    env:
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      RAILWAY_SERVICE: ${{ secrets.RAILWAY_SERVICE_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Railway CLI
+        run: |
+          curl -fsSL https://railway.com/install.sh | sh
+          echo "$HOME/.railway/bin" >> "$GITHUB_PATH"
+
+      - name: Deploy
+        run: railway up --service "$RAILWAY_SERVICE" --ci
+
+      - name: Smoke test /health
+        run: |
+          for i in $(seq 1 12); do
+            code=$(curl -s -o /dev/null -w "%{http_code}" https://gridsentinel-api-production.up.railway.app/health)
+            echo "attempt $i: HTTP $code"
+            if [ "$code" = "200" ]; then exit 0; fi
+            sleep 15
+          done
+          echo "API never came back healthy"
+          exit 1

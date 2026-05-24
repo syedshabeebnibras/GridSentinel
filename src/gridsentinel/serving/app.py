@@ -17,6 +17,7 @@ Run locally:
 """
 from __future__ import annotations
 
+import os
 import time
 from contextlib import asynccontextmanager
 from datetime import datetime
@@ -26,6 +27,7 @@ from typing import Any
 import numpy as np
 import pandas as pd
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from gridsentinel import __version__ as pkg_version
@@ -113,6 +115,28 @@ app = FastAPI(
     ),
     version=pkg_version,
     lifespan=lifespan,
+)
+
+# CORS — allow the Vercel showcase site (and any custom domain) to fetch
+# live /at-risk and /version data. Permissive in dev; tighten allow_origins
+# in production if you add authenticated endpoints.
+_default_origins = [
+    "https://gridsentinel.vercel.app",
+    "https://gridsentinel-7k47i21iw-syedshabeebnibras-projects.vercel.app",
+    "http://localhost:3000",
+    "http://localhost:8501",
+]
+_extra = os.environ.get("CORS_EXTRA_ORIGINS", "").split(",")
+_origins = _default_origins + [o.strip() for o in _extra if o.strip()]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=_origins,
+    # Cover every Vercel preview URL on this project (-* subdomains)
+    allow_origin_regex=r"https://gridsentinel-[\w-]+\.vercel\.app",
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["*"],
+    allow_credentials=False,
 )
 
 

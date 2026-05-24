@@ -348,12 +348,26 @@ metrics.parquet ─┴──────────► PdM training pipeline �
               FastAPI · Streamlit · Next.js.
             </div>
           </div>
-          <div className="flex gap-4 text-sm">
+          <div className="flex flex-wrap gap-4 text-sm">
             <a
               href="https://github.com/syedshabeebnibras/GridSentinel"
               className="text-accent hover:underline"
             >
               GitHub
+            </a>
+            <a
+              href="https://gridsentinel-api-production.up.railway.app/docs"
+              className="text-accent hover:underline"
+            >
+              API docs
+            </a>
+            {/* TABLEAU_PUBLIC_URL_PLACEHOLDER — replace href with the real
+                Tableau Public URL after publishing. */}
+            <a
+              href="https://public.tableau.com/profile/syedshabeebnibras"
+              className="text-accent hover:underline"
+            >
+              Tableau Public →
             </a>
             <a
               href="https://github.com/syedshabeebnibras/GridSentinel/blob/main/README.md"

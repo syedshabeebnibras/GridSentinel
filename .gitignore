@@ -36,6 +36,10 @@ data/models/v*/
 data/models/LATEST
 mlruns/
 
+# Tableau Hyper API runtime log
+hyperd.log
+data/tableau/_hyper/
+
 # Pre-stage placeholders so empty dirs survive
 !data/synthetic/.gitkeep
 !data/reports/.gitkeep

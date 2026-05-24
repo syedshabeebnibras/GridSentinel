@@ -35,8 +35,20 @@ jobs:
           curl -fsSL https://railway.com/install.sh | bash
           echo "$HOME/.railway/bin" >> "$GITHUB_PATH"
 
-      - name: Deploy
-        run: railway up --service "$RAILWAY_SERVICE" --ci
+      - name: Deploy (with retry on Railway backend timeouts)
+        run: |
+          for attempt in 1 2 3; do
+            echo "::group::railway up attempt $attempt"
+            if railway up --service "$RAILWAY_SERVICE" --ci; then
+              echo "::endgroup::"
+              exit 0
+            fi
+            echo "::endgroup::"
+            echo "attempt $attempt failed, retrying in 20s..."
+            sleep 20
+          done
+          echo "all 3 deploy attempts failed"
+          exit 1
 
       - name: Smoke test /health
         run: |

@@ -34,9 +34,15 @@ streamlit run src/gridsentinel/dashboard/app.py
 python -m gridsentinel.powerbi.export
 # → opens at data/powerbi/ — see README there for Power BI Desktop setup
 
-# 4. Also export to Tableau Public (CSV only)
+# 4. Also export to Tableau Public (CSV only) + build the .twbx workbook
 python -m gridsentinel.tableau.export
-# → data/tableau/ — see README + calculated_fields.txt there
+python -m gridsentinel.bi.twbx
+# → data/tableau/GridSentinel.twbx — open in Tableau Public Desktop on macOS
+
+# 4b. Build the Power BI template (.pbit) + fallback .pq script
+python -m gridsentinel.bi.pbit
+# → data/powerbi/GridSentinel.pbit (Windows Power BI Desktop)
+# → data/powerbi/GridSentinel.pq   (paste into Advanced Editor as a fallback)
 
 # 5. Train + score the predictive-maintenance model
 python -m gridsentinel.predict.score

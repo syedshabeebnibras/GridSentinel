@@ -1,41 +1,48 @@
-# GridSentinel — Tableau Public dataset
+# GridSentinel — Tableau dataset
 
-Same star schema as the Power BI export, formatted for Tableau Public (which
-does not read parquet — CSV only).
+Star-schema CSV export plus a packaged Tableau workbook ready to open in
+Tableau Public Desktop (free, macOS / Windows).
 
-## Tables
+## What's in this folder
 
-| File | Grain | Joins |
-|---|---|---|
-| `fact_events.csv` | one row per raw telemetry event | `node_id → dim_fleet`, `tick → dim_time` |
-| `fact_incidents.csv` | one row per correlated incident | `cluster_id → fact_clusters` |
-| `fact_hourly_kpi.csv` | one row per hour | `tick → dim_time` |
-| `fact_clusters.csv` | one row per root-cause family | — |
-| `dim_fleet.csv` | one row per node (rack/zone/feed/spine) | — |
-| `dim_time.csv` | one row per tick (datetime/hour/weekday) | — |
+| File | Purpose |
+|---|---|
+| `GridSentinel.twbx` | **Packaged Tableau workbook** — bundles all 6 CSVs + workbook XML. Double-click to open. |
+| `*.csv` | Star-schema flat files: `fact_events`, `fact_incidents`, `fact_hourly_kpi`, `fact_clusters`, `dim_fleet`, `dim_time`. |
+| `calculated_fields.txt` | Reference list of Tableau Calculated Fields (compression, MTTR, perf/Watt, etc). |
+| `schema.json` | Machine-readable relationship manifest. |
 
-## How to load in Tableau Public
+## How to use
 
-1. Open Tableau Public Desktop (free download — Win/Mac).
-2. **Connect → Text file** → pick `fact_events.csv`.
-3. In the Data Source pane, drag in the other CSV files to create a federated
-   model. Use these relationships:
-   - `fact_events.node_id  =  dim_fleet.node_id`     (many-to-one)
-   - `fact_events.tick     =  dim_time.tick`         (many-to-one)
-   - `fact_hourly_kpi.tick =  dim_time.tick`         (many-to-one)
-   - `fact_incidents.cluster_id = fact_clusters.cluster_id`  (many-to-one)
-4. Open `calculated_fields.txt` and paste each formula in as a new
-   Calculated Field on the matching table (table name appears as a header).
+### 1. Open the workbook
 
-## Suggested worksheets
+```bash
+# macOS
+open GridSentinel.twbx
+```
 
-- **KPI cards**: Alert Compression, Critical Incidents, MTTR, Perf/Watt, Idle Waste $.
-- **Line chart**: `dim_time.datetime` on Columns, `Avg Fleet Draw kW` + `GPU Utilization %` dual-axis on Rows.
-- **Treemap**: `fact_clusters.cluster_label` size = `count`.
-- **Heatmap**: rows = `dim_fleet.zone_id`, columns = `dim_time.hour`, color = critical-incident count.
-- **Highlight table** for top-10 at-risk nodes (after running `python -m gridsentinel.predict.score`).
+Tableau Public Desktop opens and 6 data sources appear in the left pane. The
+relationships (events↔fleet via `node_id`, kpi↔time via `tick`, etc.) are
+defined in `schema.json` and need to be wired in Tableau's Data Model view on
+first open.
 
-## Refreshing
+### 2. Build visuals
 
-After re-running the simulator, run `python -m gridsentinel.tableau.export` and
-in Tableau: **Data → Refresh All Extracts**.
+Drag fields to the Rows / Columns shelves to build sheets. Suggested starts:
+
+- **KPI cards** — Alert Compression, Critical Incidents, MTTR (hours), Perf/Watt
+- **Bar chart** — `fact_incidents[root_kind]` on Columns, `COUNTD(incident_id)` on Rows
+- **Heatmap** — Rows = `dim_fleet[zone_id]`, Columns = `dim_time[hour]`, Color = critical-incident count
+- **Treemap** — `fact_clusters[cluster_label]` sized by `count`
+
+### 3. Publish to Tableau Public
+
+`File → Save to Tableau Public As...` — public URL you can link from your
+portfolio / resume.
+
+## Regenerating
+
+```bash
+python -m gridsentinel.tableau.export    # regenerate CSVs from latest sim
+python -m gridsentinel.bi.twbx           # rebuild GridSentinel.twbx
+```

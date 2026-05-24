@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { color-scheme: dark; }
+  body { @apply bg-bg text-ink antialiased; }
+  ::selection { background: rgba(94, 234, 212, 0.25); }
+}
+
+.glow {
+  background: radial-gradient(60% 80% at 50% 0%, rgba(94, 234, 212, 0.10) 0%, transparent 70%);
+}
+
+.panel {
+  @apply rounded-xl border border-line bg-panel;
+}
+
+.kpi-num {
+  font-feature-settings: "tnum" on;
+  letter-spacing: -0.02em;
+}

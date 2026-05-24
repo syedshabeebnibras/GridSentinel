@@ -1,0 +1,135 @@
+{
+  "generated_at": "2026-05-24T19:11:28.607535+00:00",
+  "model_version": "v2",
+  "data_hash": "272c9b5f2621304e",
+  "kpis": {
+    "raw_events": 208479,
+    "incidents": 18125,
+    "compression_x": 11.5,
+    "noise_rate": 0.831,
+    "critical_incidents": 1201,
+    "fleet_kw_avg": 2068.0,
+    "total_kwh": 694780.0,
+    "idle_kwh": 1289.0,
+    "idle_waste_dollars": 77.0,
+    "perf_per_watt_tflops": 0.9157
+  },
+  "pdm_metrics": {
+    "roc_auc_mean": 0.54,
+    "roc_auc_std": 0.027,
+    "pr_auc_mean": 0.205,
+    "brier_mean": 0.1797,
+    "precision_at_10_mean": 0.4,
+    "lift_at_10_mean": 2.4,
+    "cox_c_index": 0.567,
+    "n_features": 72,
+    "n_folds": 5,
+    "n_training_rows": 22000
+  },
+  "top_at_risk": [
+    {
+      "node_id": "node-0425",
+      "rack_id": "rack-085",
+      "zone_id": "zone-4",
+      "failure_risk_24h": 1.0,
+      "anomaly_score": 0.2323114416316139
+    },
+    {
+      "node_id": "node-0387",
+      "rack_id": "rack-077",
+      "zone_id": "zone-3",
+      "failure_risk_24h": 0.9423076923076923,
+      "anomaly_score": 0.9078282243611012
+    },
+    {
+      "node_id": "node-0022",
+      "rack_id": "rack-004",
+      "zone_id": "zone-0",
+      "failure_risk_24h": 0.9057971014492754,
+      "anomaly_score": 0.9749707842954755
+    },
+    {
+      "node_id": "node-0162",
+      "rack_id": "rack-032",
+      "zone_id": "zone-1",
+      "failure_risk_24h": 0.9057971014492754,
+      "anomaly_score": 0.18596621024092957
+    },
+    {
+      "node_id": "node-0199",
+      "rack_id": "rack-039",
+      "zone_id": "zone-1",
+      "failure_risk_24h": 0.9057971014492754,
+      "anomaly_score": 0.21178443996398977
+    },
+    {
+      "node_id": "node-0259",
+      "rack_id": "rack-051",
+      "zone_id": "zone-2",
+      "failure_risk_24h": 0.9057971014492754,
+      "anomaly_score": 0.20193570001428246
+    },
+    {
+      "node_id": "node-0372",
+      "rack_id": "rack-074",
+      "zone_id": "zone-3",
+      "failure_risk_24h": 0.9057971014492754,
+      "anomaly_score": 0.336025484199754
+    },
+    {
+      "node_id": "node-0388",
+      "rack_id": "rack-077",
+      "zone_id": "zone-3",
+      "failure_risk_24h": 0.9057971014492754,
+      "anomaly_score": 0.2875298307934875
+    },
+    {
+      "node_id": "node-0404",
+      "rack_id": "rack-080",
+      "zone_id": "zone-4",
+      "failure_risk_24h": 0.9057971014492754,
+      "anomaly_score": 0.1389368736539028
+    },
+    {
+      "node_id": "node-0481",
+      "rack_id": "rack-096",
+      "zone_id": "zone-4",
+      "failure_risk_24h": 0.9057971014492754,
+      "anomaly_score": 0.5681805734330876
+    }
+  ],
+  "top_features": [
+    {
+      "feature": "ev_nvlink_fault_warn",
+      "mean_abs_shap": 0.1914518162594295
+    },
+    {
+      "feature": "gpu_sm_util__mean",
+      "mean_abs_shap": 0.10497531200781123
+    },
+    {
+      "feature": "ev_nvlink_fault_critical",
+      "mean_abs_shap": 0.08415195165879026
+    },
+    {
+      "feature": "gpu_power_w__max",
+      "mean_abs_shap": 0.08261080577430796
+    },
+    {
+      "feature": "gpu_sm_util__vol_max",
+      "mean_abs_shap": 0.07945040061939238
+    },
+    {
+      "feature": "gpu_temp_c__max",
+      "mean_abs_shap": 0.07302784991508911
+    },
+    {
+      "feature": "gpu_temp_c__range",
+      "mean_abs_shap": 0.0713411594954817
+    },
+    {
+      "feature": "gpu_temp_c__min",
+      "mean_abs_shap": 0.07089165601035251
+    }
+  ]
+}

@@ -71,11 +71,22 @@ async def lifespan(app: FastAPI):
 
     # Pre-compute the most recent (node, window) feature snapshot so
     # /at-risk and /predict-by-node are O(1) lookups instead of recomputing.
-    data_dir = Path(__file__).resolve().parents[3] / "data" / "synthetic"
+    # Preferred path: read the persisted parquet that `predict.score` writes
+    # (small, ~50 KB). Fallback: rebuild from raw 16M-row metrics if present.
+    repo_root = Path(__file__).resolve().parents[3]
+    persisted = repo_root / "data" / "predict" / "latest_window.parquet"
+    data_dir = repo_root / "data" / "synthetic"
     metrics_path = data_dir / "metrics.parquet"
     events_path = data_dir / "events.parquet"
     fleet_path = data_dir / "fleet.parquet"
-    if metrics_path.exists() and events_path.exists() and fleet_path.exists():
+
+    if persisted.exists():
+        try:
+            latest = pd.read_parquet(persisted)
+            _state["latest_windows"] = latest.set_index("node_id")
+        except Exception as e:
+            print(f"warning: failed to load persisted latest_window: {e}")
+    elif metrics_path.exists() and events_path.exists() and fleet_path.exists():
         try:
             metrics = pd.read_parquet(metrics_path)
             events = pd.read_parquet(events_path)

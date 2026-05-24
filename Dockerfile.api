@@ -1,0 +1,47 @@
+# Slim FastAPI image for Railway. Drops the heavy training-only deps
+# (torch, mlflow, shap) — the API only needs to LOAD a pre-trained model
+# artifact and serve predictions. The full training stack stays in
+# pyproject.toml under [ml] and runs locally / in CI.
+
+FROM python:3.13-slim AS builder
+WORKDIR /app
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential && rm -rf /var/lib/apt/lists/*
+
+# Inference-only deps — no torch, no mlflow, no shap. lifelines needed
+# because the SurvivalModel artifact references it; everything else is for
+# scoring + the FastAPI layer.
+COPY pyproject.toml README.md ./
+COPY src/ ./src/
+
+RUN pip install --no-cache-dir \
+    "numpy>=1.26" "pandas>=2.2" "pyarrow>=15" "pydantic>=2.6" \
+    "scikit-learn>=1.4" "hdbscan>=0.8.33" "statsmodels>=0.14" \
+    "lifelines>=0.30" "joblib>=1.4" \
+    "fastapi>=0.115" "uvicorn[standard]>=0.30" \
+    "rich>=13.7" "typer>=0.12" "tabulate>=0.9" \
+    && pip install --no-cache-dir --no-deps -e .
+
+FROM python:3.13-slim
+WORKDIR /app
+RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+
+COPY --from=builder /usr/local/lib/python3.13/site-packages /usr/local/lib/python3.13/site-packages
+COPY --from=builder /usr/local/bin /usr/local/bin
+COPY --from=builder /app /app
+
+# The registry + a small slice of synthetic data ride along so the API
+# has a model to load + a cached latest-window for /at-risk.
+COPY data/models/ ./data/models/
+COPY data/predict/latest_window.parquet ./data/predict/latest_window.parquet
+COPY data/synthetic/events.parquet ./data/synthetic/events.parquet
+COPY data/synthetic/fleet.parquet ./data/synthetic/fleet.parquet
+
+ENV PYTHONUNBUFFERED=1 \
+    PORT=8080 \
+    PYTHONPATH=/app/src
+
+EXPOSE 8080
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
+    CMD curl -fsS http://localhost:${PORT}/health || exit 1
+
+CMD ["sh", "-c", "uvicorn gridsentinel.serving.app:app --host 0.0.0.0 --port ${PORT}"]

@@ -1,14 +1,11 @@
+# Aggressive ignore — the slim API image only needs source + the
+# explicit api_runtime/ artifacts.
 .git
 .venv
 venv
 node_modules
 web/
 mlruns/
-data/synthetic/metrics.parquet
-data/synthetic/utilization.parquet
-data/powerbi/
-data/tableau/
-data/reports/
 docs/
 notebooks/
 tests/
@@ -19,3 +16,11 @@ __pycache__
 .ruff_cache
 .DS_Store
 .env
+
+# Everything under data/ EXCEPT what we explicitly stage in api_runtime/
+data/synthetic/
+data/predict/
+data/powerbi/
+data/tableau/
+data/reports/
+data/models/

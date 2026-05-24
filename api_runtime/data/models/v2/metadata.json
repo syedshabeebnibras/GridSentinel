@@ -1,0 +1,153 @@
+{
+  "version": 2,
+  "created_at": "2026-05-24T17:28:01.489711Z",
+  "data_hash": "272c9b5f2621304e",
+  "n_training_rows": 22000,
+  "n_features": 72,
+  "feature_names": [
+    "gpu_temp_c__mean",
+    "gpu_temp_c__std",
+    "gpu_temp_c__min",
+    "gpu_temp_c__max",
+    "gpu_temp_c__range",
+    "gpu_temp_c__slope",
+    "gpu_temp_c__ac1",
+    "gpu_temp_c__spike_count",
+    "gpu_temp_c__last",
+    "gpu_temp_c__vol_max",
+    "gpu_power_w__mean",
+    "gpu_power_w__std",
+    "gpu_power_w__min",
+    "gpu_power_w__max",
+    "gpu_power_w__range",
+    "gpu_power_w__slope",
+    "gpu_power_w__ac1",
+    "gpu_power_w__spike_count",
+    "gpu_power_w__last",
+    "gpu_power_w__vol_max",
+    "gpu_sm_util__mean",
+    "gpu_sm_util__std",
+    "gpu_sm_util__min",
+    "gpu_sm_util__max",
+    "gpu_sm_util__range",
+    "gpu_sm_util__slope",
+    "gpu_sm_util__ac1",
+    "gpu_sm_util__spike_count",
+    "gpu_sm_util__last",
+    "gpu_sm_util__vol_max",
+    "ecc_corrected_rate__mean",
+    "ecc_corrected_rate__std",
+    "ecc_corrected_rate__min",
+    "ecc_corrected_rate__max",
+    "ecc_corrected_rate__range",
+    "ecc_corrected_rate__slope",
+    "ecc_corrected_rate__ac1",
+    "ecc_corrected_rate__spike_count",
+    "ecc_corrected_rate__last",
+    "ecc_corrected_rate__vol_max",
+    "nvlink_crc_rate__mean",
+    "nvlink_crc_rate__std",
+    "nvlink_crc_rate__min",
+    "nvlink_crc_rate__max",
+    "nvlink_crc_rate__range",
+    "nvlink_crc_rate__slope",
+    "nvlink_crc_rate__ac1",
+    "nvlink_crc_rate__spike_count",
+    "nvlink_crc_rate__last",
+    "nvlink_crc_rate__vol_max",
+    "pcie_aer_rate__mean",
+    "pcie_aer_rate__std",
+    "pcie_aer_rate__min",
+    "pcie_aer_rate__max",
+    "pcie_aer_rate__range",
+    "pcie_aer_rate__slope",
+    "pcie_aer_rate__ac1",
+    "pcie_aer_rate__spike_count",
+    "pcie_aer_rate__last",
+    "pcie_aer_rate__vol_max",
+    "ev_ecc_uncorrectable_info",
+    "ev_ecc_uncorrectable_warn",
+    "ev_ecc_uncorrectable_critical",
+    "ev_nvlink_fault_info",
+    "ev_nvlink_fault_warn",
+    "ev_nvlink_fault_critical",
+    "ev_pcie_error_info",
+    "ev_pcie_error_warn",
+    "ev_pcie_error_critical",
+    "ev_thermal_throttle_info",
+    "ev_thermal_throttle_warn",
+    "ev_thermal_throttle_critical"
+  ],
+  "label": "failed_next_24h",
+  "metrics": {
+    "n_features": 72,
+    "n_total": 22000,
+    "pos_rate": 0.1678181818181818,
+    "roc_auc_mean": 0.5395539858859012,
+    "roc_auc_std": 0.027484731148312302,
+    "pr_auc_mean": 0.20526918445679998,
+    "brier_mean": 0.17974116176283797,
+    "precision_at_10_mean": 0.4,
+    "lift_at_10_mean": 2.4039770540427985,
+    "n_folds": 5
+  },
+  "cv_metrics": {
+    "n_train": {
+      "mean": 11002.0,
+      "std": 5184.506919659766
+    },
+    "n_test": {
+      "mean": 3666.0,
+      "std": 0.0
+    },
+    "test_pos_rate": {
+      "mean": 0.1788870703764321,
+      "std": 0.020211569532263454
+    },
+    "roc_auc": {
+      "mean": 0.5395539858859012,
+      "std": 0.027484731148312302
+    },
+    "pr_auc": {
+      "mean": 0.20526918445679998,
+      "std": 0.026121247770034592
+    },
+    "brier": {
+      "mean": 0.17974116176283797,
+      "std": 0.02255130853096876
+    },
+    "precision_at_10": {
+      "mean": 0.4,
+      "std": 0.21908902300206645
+    },
+    "lift_at_10": {
+      "mean": 2.4039770540427985,
+      "std": 1.5893183713915666
+    },
+    "precision_at_25": {
+      "mean": 0.392,
+      "std": 0.16079800993793422
+    },
+    "lift_at_25": {
+      "mean": 2.3278419512813517,
+      "std": 1.2687879612082962
+    },
+    "precision_at_50": {
+      "mean": 0.332,
+      "std": 0.07756287771866126
+    },
+    "lift_at_50": {
+      "mean": 1.9374680024699753,
+      "std": 0.7321689054293198
+    }
+  },
+  "survival_metrics": {
+    "c_index": 0.5672301198211268,
+    "n_train": 15500,
+    "n_test": 6500,
+    "event_rate_train": 0.15696774193548388,
+    "event_rate_test": 0.1936923076923077,
+    "concordance_train": 0.609068863243662
+  },
+  "anomaly_contamination": 0.05
+}

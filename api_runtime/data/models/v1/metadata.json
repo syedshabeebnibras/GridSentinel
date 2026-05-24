@@ -1,0 +1,141 @@
+{
+  "version": 1,
+  "created_at": "2026-05-24T17:20:41.478095Z",
+  "data_hash": "7ecbf1db6315a278",
+  "n_training_rows": 22000,
+  "n_features": 60,
+  "feature_names": [
+    "gpu_temp_c__mean",
+    "gpu_temp_c__std",
+    "gpu_temp_c__min",
+    "gpu_temp_c__max",
+    "gpu_temp_c__range",
+    "gpu_temp_c__slope",
+    "gpu_temp_c__ac1",
+    "gpu_temp_c__spike_count",
+    "gpu_temp_c__last",
+    "gpu_temp_c__vol_max",
+    "gpu_power_w__mean",
+    "gpu_power_w__std",
+    "gpu_power_w__min",
+    "gpu_power_w__max",
+    "gpu_power_w__range",
+    "gpu_power_w__slope",
+    "gpu_power_w__ac1",
+    "gpu_power_w__spike_count",
+    "gpu_power_w__last",
+    "gpu_power_w__vol_max",
+    "gpu_sm_util__mean",
+    "gpu_sm_util__std",
+    "gpu_sm_util__min",
+    "gpu_sm_util__max",
+    "gpu_sm_util__range",
+    "gpu_sm_util__slope",
+    "gpu_sm_util__ac1",
+    "gpu_sm_util__spike_count",
+    "gpu_sm_util__last",
+    "gpu_sm_util__vol_max",
+    "ecc_corrected_rate__mean",
+    "ecc_corrected_rate__std",
+    "ecc_corrected_rate__min",
+    "ecc_corrected_rate__max",
+    "ecc_corrected_rate__range",
+    "ecc_corrected_rate__slope",
+    "ecc_corrected_rate__ac1",
+    "ecc_corrected_rate__spike_count",
+    "ecc_corrected_rate__last",
+    "ecc_corrected_rate__vol_max",
+    "nvlink_crc_rate__mean",
+    "nvlink_crc_rate__std",
+    "nvlink_crc_rate__min",
+    "nvlink_crc_rate__max",
+    "nvlink_crc_rate__range",
+    "nvlink_crc_rate__slope",
+    "nvlink_crc_rate__ac1",
+    "nvlink_crc_rate__spike_count",
+    "nvlink_crc_rate__last",
+    "nvlink_crc_rate__vol_max",
+    "pcie_aer_rate__mean",
+    "pcie_aer_rate__std",
+    "pcie_aer_rate__min",
+    "pcie_aer_rate__max",
+    "pcie_aer_rate__range",
+    "pcie_aer_rate__slope",
+    "pcie_aer_rate__ac1",
+    "pcie_aer_rate__spike_count",
+    "pcie_aer_rate__last",
+    "pcie_aer_rate__vol_max"
+  ],
+  "label": "failed_next_24h",
+  "metrics": {
+    "n_features": 60,
+    "n_total": 22000,
+    "pos_rate": 0.1678181818181818,
+    "roc_auc_mean": 0.5176377487052608,
+    "roc_auc_std": 0.01232723592829458,
+    "pr_auc_mean": 0.1897709969801837,
+    "brier_mean": 0.18493184839885118,
+    "precision_at_10_mean": 0.24,
+    "lift_at_10_mean": 1.3888311035525147,
+    "n_folds": 5
+  },
+  "cv_metrics": {
+    "n_train": {
+      "mean": 11002.0,
+      "std": 5184.506919659766
+    },
+    "n_test": {
+      "mean": 3666.0,
+      "std": 0.0
+    },
+    "test_pos_rate": {
+      "mean": 0.1788870703764321,
+      "std": 0.020211569532263454
+    },
+    "roc_auc": {
+      "mean": 0.5176377487052608,
+      "std": 0.01232723592829458
+    },
+    "pr_auc": {
+      "mean": 0.1897709969801837,
+      "std": 0.025790744439230313
+    },
+    "brier": {
+      "mean": 0.18493184839885118,
+      "std": 0.024179170041355617
+    },
+    "precision_at_10": {
+      "mean": 0.24,
+      "std": 0.07999999999999999
+    },
+    "lift_at_10": {
+      "mean": 1.3888311035525147,
+      "std": 0.5579406793242485
+    },
+    "precision_at_25": {
+      "mean": 0.264,
+      "std": 0.082365041127896
+    },
+    "lift_at_25": {
+      "mean": 1.5425677569018923,
+      "std": 0.6519564644641995
+    },
+    "precision_at_50": {
+      "mean": 0.252,
+      "std": 0.029933259094191537
+    },
+    "lift_at_50": {
+      "mean": 1.4402894535810695,
+      "std": 0.3143860442330212
+    }
+  },
+  "survival_metrics": {
+    "c_index": 0.4979774700576002,
+    "n_train": 15500,
+    "n_test": 6500,
+    "event_rate_train": 0.15696774193548388,
+    "event_rate_test": 0.1936923076923077,
+    "concordance_train": 0.5623590781973496
+  },
+  "anomaly_contamination": 0.05
+}

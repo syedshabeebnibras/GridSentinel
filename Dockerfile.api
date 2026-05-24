@@ -1,15 +1,12 @@
-# Slim FastAPI image for Railway. Drops the heavy training-only deps
-# (torch, mlflow, shap) — the API only needs to LOAD a pre-trained model
-# artifact and serve predictions. The full training stack stays in
-# pyproject.toml under [ml] and runs locally / in CI.
+# Slim FastAPI image for Railway. Drops training-only deps (torch, mlflow,
+# shap) — the API only loads a pre-trained model artifact and serves
+# predictions. The full training stack stays in pyproject.toml under [ml]
+# and runs locally / in CI.
 
 FROM python:3.13-slim AS builder
 WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends build-essential && rm -rf /var/lib/apt/lists/*
 
-# Inference-only deps — no torch, no mlflow, no shap. lifelines needed
-# because the SurvivalModel artifact references it; everything else is for
-# scoring + the FastAPI layer.
 COPY pyproject.toml README.md ./
 COPY src/ ./src/
 
@@ -29,12 +26,11 @@ COPY --from=builder /usr/local/lib/python3.13/site-packages /usr/local/lib/pytho
 COPY --from=builder /usr/local/bin /usr/local/bin
 COPY --from=builder /app /app
 
-# The registry + a small slice of synthetic data ride along so the API
-# has a model to load + a cached latest-window for /at-risk.
-COPY data/models/ ./data/models/
-COPY data/predict/latest_window.parquet ./data/predict/latest_window.parquet
-COPY data/synthetic/events.parquet ./data/synthetic/events.parquet
-COPY data/synthetic/fleet.parquet ./data/synthetic/fleet.parquet
+# Pre-staged runtime artifacts (registered model + small synthetic slice +
+# persisted latest scoring window). Built locally by the deploy helper:
+# `cp data/{models,predict/latest_window.parquet,synthetic/{events,fleet}.parquet}
+#  api_runtime/` before `railway up`.
+COPY api_runtime/data/ ./data/
 
 ENV PYTHONUNBUFFERED=1 \
     PORT=8080 \

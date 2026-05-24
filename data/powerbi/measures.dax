@@ -1,0 +1,59 @@
+// GridSentinel — paste-ready DAX measures
+// Load all parquet files in data/powerbi/ as tables, then add these measures.
+
+// === SLA ===
+Total Events =
+COUNTROWS ( fact_events )
+
+Total Incidents =
+COUNTROWS ( fact_incidents )
+
+Alert Compression Ratio =
+DIVIDE ( [Total Events], [Total Incidents], BLANK () )
+
+Noise Rate =
+DIVIDE (
+    CALCULATE ( COUNTROWS ( fact_events ), fact_events[benign] = TRUE () ),
+    [Total Events]
+)
+
+Critical Incidents =
+CALCULATE ( COUNTROWS ( fact_incidents ), fact_incidents[severity_max] = "critical" )
+
+MTTR (hours) =
+AVERAGEX ( fact_incidents, fact_incidents[duration_ticks] / 12 )
+
+// === Energy / efficiency ===
+Total Energy kWh =
+SUM ( fact_hourly_kpi[fleet_kw] )
+
+Aggregate TFLOPS =
+SUMX ( fact_hourly_kpi, fact_hourly_kpi[gpu_hours] * 1000 )  // H100 ~ 1000 TF FP16
+
+Perf per Watt (TFLOPS/W) =
+DIVIDE ( [Aggregate TFLOPS], [Total Energy kWh] * 1000 )
+
+Avg Fleet Draw kW =
+AVERAGE ( fact_hourly_kpi[fleet_kw] )
+
+Idle GPU-hours =
+CALCULATE (
+    SUMX ( fact_hourly_kpi, fact_hourly_kpi[idle_gpu_count] ),
+    fact_hourly_kpi[idle_gpu_count] > 0
+)
+
+Idle Energy Waste kWh =
+[Idle GPU-hours] * 0.21  // 0.3 * 700W / 1000 = 0.21 kWh per idle GPU-hour
+
+Idle Waste $ =
+[Idle Energy Waste kWh] * 0.06  // $/kWh — adjust to PPA rate
+
+// === Capacity ===
+Fleet Capacity GPU-h-per-hour =
+COUNTROWS ( dim_fleet ) * 8
+
+GPU Utilization % =
+DIVIDE ( SUM ( fact_hourly_kpi[gpu_hours] ), [Fleet Capacity GPU-h-per-hour] * COUNTROWS ( fact_hourly_kpi ) )
+
+Headroom % =
+1 - [GPU Utilization %]

@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Secrets
+.env
+
+# OS
+.DS_Store
+
+# Generated data — anything regenerable from `python -m gridsentinel.simulator.emit`
+data/synthetic/*.parquet
+data/synthetic/*.csv
+data/reports/*.md
+data/reports/*.html
+data/predict/*.csv
+data/predict/*.parquet
+data/predict/*.json
+
+# BI exports — regenerable from data/synthetic/. Keep the README + DAX + manifest only.
+data/powerbi/*.parquet
+data/powerbi/*.csv
+data/tableau/*.csv
+
+# ML artifacts — model registry + experiment tracking. Keep README only.
+data/models/v*/
+data/models/LATEST
+mlruns/
+
+# Pre-stage placeholders so empty dirs survive
+!data/synthetic/.gitkeep
+!data/reports/.gitkeep

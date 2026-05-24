@@ -1,0 +1,44 @@
+// GridSentinel — Tableau Calculated Field definitions
+// Paste each block as a new Calculated Field on the indicated table.
+
+// === fact_events / fact_incidents ===
+
+// Alert Compression Ratio (parameterise as a calculation across the federated model)
+COUNTD([fact_events].[Tick]) /  // raw event count proxy
+COUNTD([fact_incidents].[Incident Id])
+
+// Noise Rate
+SUM(IF [benign] = TRUE THEN 1 ELSE 0 END) / COUNT([Tick])
+
+// Critical Incidents
+COUNTD(IF [Severity Max] = "critical" THEN [Incident Id] END)
+
+// MTTR (hours) — duration_ticks at 12 ticks/hour
+AVG([Duration Ticks]) / 12
+
+// === fact_hourly_kpi ===
+
+// Total Energy kWh (each row is 1 hour of fleet_kw, so kW × 1h = kWh)
+SUM([Fleet Kw])
+
+// Avg Fleet Draw kW
+AVG([Fleet Kw])
+
+// GPU Utilization %
+SUM([Gpu Hours]) / (COUNT([Tick]) * [Fleet Capacity Parameter])
+
+// === Idle waste — use a parameter for $/kWh ===
+
+// Idle Energy Waste kWh
+SUM([Idle Gpu Count]) * 0.21    // 0.3 * 700W TDP / 1000 = 0.21 kWh per idle GPU-hour
+
+// Idle Waste USD
+[Idle Energy Waste kWh] * [Electricity Price Parameter]
+
+// === Performance per Watt ===
+
+// Aggregate TFLOPS (H100 ~ 1000 TF FP16 at full util)
+SUM([Gpu Hours]) * 1000
+
+// Perf per Watt
+[Aggregate TFLOPS] / ([Total Energy kWh] * 1000)

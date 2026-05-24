@@ -1,0 +1,50 @@
+{
+  "tables": {
+    "fact_events": {
+      "file": "fact_events.csv",
+      "grain": "raw event"
+    },
+    "fact_incidents": {
+      "file": "fact_incidents.csv",
+      "grain": "correlated incident"
+    },
+    "fact_hourly_kpi": {
+      "file": "fact_hourly_kpi.csv",
+      "grain": "fleet hour"
+    },
+    "fact_clusters": {
+      "file": "fact_clusters.csv",
+      "grain": "root-cause family"
+    },
+    "dim_fleet": {
+      "file": "dim_fleet.csv",
+      "grain": "node"
+    },
+    "dim_time": {
+      "file": "dim_time.csv",
+      "grain": "tick"
+    }
+  },
+  "relationships": [
+    {
+      "left": "fact_events.node_id",
+      "right": "dim_fleet.node_id",
+      "type": "many-to-one"
+    },
+    {
+      "left": "fact_events.tick",
+      "right": "dim_time.tick",
+      "type": "many-to-one"
+    },
+    {
+      "left": "fact_hourly_kpi.tick",
+      "right": "dim_time.tick",
+      "type": "many-to-one"
+    },
+    {
+      "left": "fact_incidents.cluster_id",
+      "right": "fact_clusters.cluster_id",
+      "type": "many-to-one"
+    }
+  ]
+}
